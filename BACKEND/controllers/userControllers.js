@@ -51,7 +51,7 @@ const login =asyncHandler( async (req, res) => {
         })
     } else{
         res.status(401)
-        throw new Error('Credenciales Incorrectas')
+        throw new Error('El usuario o la contraseña es incorrecta')
     }
 })
 
@@ -62,6 +62,14 @@ const generarToken = (idusuario) => {
 
 // Controlador para ver un usuario
 const showdata =asyncHandler( async (req, res) => {
+    const userId = req.params.id;
+
+    const user = await User.findById(userId);
+
+    if(!user){     
+        res.status(404)
+        throw new Error('El usuario no existe')
+    }
     res.status(200).json(req.user)
 })
 
@@ -74,7 +82,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
     if (!user) {
         res.status(404);
-        throw new Error('Usuario no encontrado');
+        throw new Error('El usuario no existe');
     }
 
     // Borrar el usuario de la base de datos
