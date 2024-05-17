@@ -1,38 +1,33 @@
-const jwt = require('jsonwebtoken')
-const asyncHandler = require('express-async-handler')
-const User = require('../models/userModel')
+const jwt = require('jsonwebtoken');
+const asyncHandler = require('express-async-handler');
+const User = require('../models/userModel');
 
-const protect = asyncHandler( async (req, res ,next) => {
-    //obtenemos el token 
-    let token
-    
-    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+const protect = asyncHandler(async (req, res, next) => {
+    let token;
+
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         try {
-            //obtenemos el token
-            token = req.headers.authorization.split(' ')[1]
-    
-            //verificamos las forma del token
-            const decoded = jwt.verify(token, process.env.JWT_SECRET)
-            
-            //obtener los datos del usuario del payload del token y lo vamos a poner en un objeto
-            req.user = await User.findById(decoded.idusuario).select('-password')
+            // Obtener el token de los headers
+            token = req.headers.authorization.split(' ')[1];
 
-            next()
+            // Verificar el token
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+            // Obtener el usuario del token
+            req.user = await User.findById(decoded.idusuario).select('-password');
+
+            next();
         } catch (error) {
-            console.log(error)
-            res.status(401)
-            throw new Error('Acceso no autorizado')
+            console.error(error);
+            res.status(401);
+            throw new Error('Acceso no autorizado, token fallido');
         }
     }
-    
-    if(!token){
-        res.status(401)
-        throw new Error('Acceso no autorizado, no proporcionaste el token')
+
+    if (!token) {
+        res.status(401);
+        throw new Error('Acceso no autorizado, no se proporcionó token');
     }
+});
 
-})
-
-module.exports = {
-    protect
-}
+module.exports = { protect };

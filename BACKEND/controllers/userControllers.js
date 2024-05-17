@@ -56,8 +56,8 @@ const login =asyncHandler( async (req, res) => {
 })
 
 const generarToken = (idusuario) => {
-    return jwt.sign({idusuario}, process.env.JWT_SECRET)
-    expiresIn: '30d'
+    return jwt.sign({idusuario}, process.env.JWT_SECRET,
+    {expiresIn: '30d'})
 }
 
 // Controlador para ver un usuario
